@@ -17,23 +17,26 @@ import DataInput.TrainData;
 
 public class MinerKNN {
 	int k = 20;//k近邻
+	File trainfile;
+	File testfile;
 	TrainData train;
 	TestData test;
 	String filepath;
 	public MinerKNN(File trainfile,File testfile,String filepath){	
 		train = new TrainData(trainfile);
 		test = new TestData(testfile);
-		this.filepath = filepath;
-		KNNAlgo();
+		this.trainfile = trainfile;
+		this.testfile = testfile;
+		this.filepath = filepath;	
 	}
 	public void KNNAlgo(){
 		//计算k近邻距离
 		System.out.println("=======计算k近邻距离开始========");
-		List<List<DisMap>> dislist = CalDistance(); //test.size*train.size
+		ArrayList<ArrayList<DisMap>> dislist = CalDistance(); //test.size*train.size
 		System.out.println("=======计算k近邻距离结束========");		
 		//决策出分类结果
 		System.out.println("=======决策分类开始========");
-		List<Integer> result = new ArrayList<Integer>(); //test.size
+		ArrayList<Integer> result = new ArrayList<Integer>(); //test.size
 		for(int i=0;i<test.getTestData().size();i++){
 		//for(int i=0;i<20;i++){
 			int classify = MakeDecision(dislist.get(i));
@@ -45,23 +48,36 @@ public class MinerKNN {
 		WriteResult(result, filepath);
 		System.out.println("=======结果写入文件开始========");
 	}
+	public void KDTreeAlgo(){
+		//计算k近邻距离
+		System.out.println("=======KD树开始========");
+		ArrayList<Integer> result = new ArrayList<Integer>(); //test.size
+		KDTree kdTree = new KDTree(trainfile, testfile);
+		kdTree.KDTreeMiner();
+		result = kdTree.getResult();
+		System.out.println("=======KD树结束========");
+		//写出结果
+		System.out.println("=======结果写入文件开始========");
+		WriteResult(result, filepath);
+		System.out.println("=======结果写入文件开始========");
+	}
 	/**
 	 * @title CalDistance
 	 * @description 计算数据之间的欧式距离
 	 * @return List<List<DisMap>> test.size*train.size */
-	public List<List<DisMap>> CalDistance(){
-		List<List<DisMap>> dislist = new ArrayList<List<DisMap>>();
+	public ArrayList<ArrayList<DisMap>> CalDistance(){
+		ArrayList<ArrayList<DisMap>> dislist = new ArrayList<ArrayList<DisMap>>();
 		for(int i=0;i<test.getTestData().size();i++){
 		//for(int i=0;i<20;i++){
-			List<DisMap> dis = new ArrayList<DisMap>();
-			List<String> line = test.getTestData().get(i);
+			ArrayList<DisMap> dis = new ArrayList<DisMap>();
+			ArrayList<Integer> line = test.getTestData().get(i);
 			for(int k=0;k<train.getTrainData().size();k++){
 			//for(int k=0;k<20;k++){
 				int distance = calDis(train.getTrainData().get(k), test.getTestData().get(i));							
-				DisMap disMap = new DisMap(distance, Integer.parseInt(train.getLable().get(k)));
+				DisMap disMap = new DisMap(distance, train.getLable().get(k));
 				dis.add(disMap);
 			}
-			List<DisMap> k_dis = CalKNearest(dis);
+			ArrayList<DisMap> k_dis = CalKNearest(dis);
 			dislist.add(k_dis);
 			System.out.println("计算第"+i+"个距离结束");
 		}
@@ -72,8 +88,8 @@ public class MinerKNN {
 	 * @title CalKNearest
 	 * @description 获取k近邻的点(距离最小的k个值)
 	 * @return List<DisMap>*/
-	public List<DisMap> CalKNearest(List<DisMap> dis){
-		List<DisMap> k_dis = new ArrayList<DisMap>(); 
+	public ArrayList<DisMap> CalKNearest(ArrayList<DisMap> dis){
+		ArrayList<DisMap> k_dis = new ArrayList<DisMap>(); 
 		for(int i=0;i<k;i++){
 			k_dis.add(dis.get(i));
 		}
@@ -91,7 +107,7 @@ public class MinerKNN {
 	 * @title MakeDecision
 	 * @description 决策 在k个近邻距离中，选出类别个数最大的一类
 	 * @return List<DisMap>*/
-	public int MakeDecision(List<DisMap> list){
+	public int MakeDecision(ArrayList<DisMap> list){
 		int classify = 0;
 		Map<Integer, Integer> labelNum = new HashMap<Integer, Integer>(); //map<label,count>
 		for(int i=0;i<list.size();i++){
@@ -118,7 +134,7 @@ public class MinerKNN {
 	 * @title WriteResult
 	 * @description 把result的结果写入文件path中
 	 * @return List<DisMap>*/
-	public void WriteResult(List<Integer> list,String filepath){
+	public void WriteResult(ArrayList<Integer> list,String filepath){
 		BufferedWriter bw = null;
 		
 		try{
@@ -141,7 +157,7 @@ public class MinerKNN {
 		}
 	}
 	//获取最大值
-	public DisMap getMax(List<DisMap> kdis){
+	public DisMap getMax(ArrayList<DisMap> kdis){
 		DisMap disMax = new DisMap(0, 0);
 		for(int i=0;i<kdis.size();i++){
 			DisMap disMap = kdis.get(i);
@@ -152,11 +168,11 @@ public class MinerKNN {
 		return disMax;
 	}
 	//计算两个向量的曼哈顿距离
-	public int calDis(List<String> list1,List<String> list2){
+	public int calDis(ArrayList<Integer> list1,ArrayList<Integer> list2){
 		int distance = 0;
 		for(int i=0;i<list1.size();i++){
-			int x = Integer.parseInt(list1.get(i));
-			int y = Integer.parseInt(list2.get(i));
+			int x = list1.get(i);
+			int y = list2.get(i);
 			distance += Math.abs(x-y);
 		}
 		return distance;

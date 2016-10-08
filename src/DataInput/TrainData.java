@@ -16,9 +16,9 @@ import java.util.Map;
 import javax.swing.text.html.HTMLDocument.Iterator;
 
 public class TrainData {		
-	private List<List<String>> trainData = new ArrayList<List<String>>(); //无标签数据
-	private List<String> lable = new ArrayList<String>();//标签
-
+	private ArrayList<ArrayList<Integer>> trainData = new ArrayList<ArrayList<Integer>>(); //无标签数据
+	private ArrayList<Integer> lable = new ArrayList<Integer>();//标签
+	public TrainData(){}
 	public TrainData(File file){		
 		CalculateTrain(file);		
 	}
@@ -37,11 +37,11 @@ public class TrainData {
 	         int line = 0;
 	         while ((tempString = br.readLine()) != null) {  	               
 	             String[] temp = tempString.split(",");
-	             lable.add(temp[0]);
-	             List<String> tline = new ArrayList<String>();
+	             lable.add(Integer.parseInt(temp[0]));
+	             ArrayList<Integer> tline = new ArrayList<Integer>();
 	             for(int i=1;i<temp.length;i++){
-	            	 String s = temp[i].equals("0") ? "0" : "1";
-	            	 tline.add(s);
+	            	 //String s = temp[i].equals("0") ? "0" : "1";
+	            	 tline.add(Integer.parseInt(temp[i]));
 	             }
 	             trainData.add(tline);
 	             //System.out.println("read train line:"+line);
@@ -56,16 +56,16 @@ public class TrainData {
 		
 	}
 	
-	public List<List<String>> getTrainData(){
+	public ArrayList<ArrayList<Integer>> getTrainData(){
 		return trainData;
 	}
-	public void setTrainData(List<List<String>> trainData){
+	public void setTrainData(ArrayList<ArrayList<Integer>> trainData){
 		this.trainData = trainData;
 	}
-	public List<String> getLable(){
+	public ArrayList<Integer> getLable(){
 		return lable;
 	}
-	public void setLable(List<String> lable){
+	public void setLable(ArrayList<Integer> lable){
 		this.lable = lable;
 	}
 }

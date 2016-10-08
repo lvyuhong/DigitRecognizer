@@ -11,7 +11,8 @@ import java.util.Arrays;
 import java.util.List;
 
 public class TestData {
-	private List<List<String>> testData = new ArrayList<List<String>>(); //无标签数据	
+	private ArrayList<ArrayList<Integer>> testData = new ArrayList<ArrayList<Integer>>(); //无标签数据	
+	public TestData(){}
 	public TestData(File file){
 		CalculateTest(file);
 	}
@@ -30,10 +31,10 @@ public class TestData {
 	         int line = 0;
 	         while ((tempString = br.readLine()) != null) {  	               
 	             String[] temp = tempString.split(",");
-	             List<String> tline = new ArrayList<String>();
+	             ArrayList<Integer> tline = new ArrayList<Integer>();
 	             for(int i=0;i<temp.length;i++){
-	            	 String s = temp[i].equals("0") ? "0" : "1";
-	            	 tline.add(s);
+	            	 //String s = temp[i].equals("0") ? "0" : "1";
+	            	 tline.add(Integer.parseInt(temp[i]));
 	             }
 	             testData.add(tline);
 	             //System.out.println("read test line:"+line);
@@ -46,10 +47,10 @@ public class TestData {
 	         e.printStackTrace();  
 	     } 		
 	}
-	public List<List<String>> getTestData(){
+	public ArrayList<ArrayList<Integer>> getTestData(){
 		return testData;
 	}
-	public void setTestData(List<List<String>> testList){
+	public void setTestData(ArrayList<ArrayList<Integer>> testList){
 		testData = testList;
 	}
 }
